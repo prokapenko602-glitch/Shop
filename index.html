@@ -72,6 +72,12 @@
     <div class="subtitle">Официальный магазин клана</div>
 
     <div class="grid" id="product-grid">
+        <!-- Бесплатный товар -->
+        <div class="card" style="border: 1px solid #28a745;">
+            <h3>🎁 Бесплатный набор</h3>
+            <p style="color: #28a745;">0 руб.</p>
+            <button onclick="addToCart('Бесплатный набор', 0)" style="background-color: #28a745; color: #fff;">Взять</button>
+        </div>
         <div class="card">
             <h3>Пак СМГ</h3>
             <p>15 руб.</p>
@@ -144,7 +150,6 @@
 
             text += `Итого: ${totalPrice} руб.`;
 
-            // Перенаправляем в чат с ботом с готовым текстом
             const botUsername = 'Shop122_bot';
             const url = `https://t.me/${botUsername}?start=order_${encodeURIComponent(text)}`;
 
