@@ -72,42 +72,25 @@
     <div class="subtitle">Официальный магазин клана</div>
 
     <div class="grid" id="product-grid">
-        <!-- Товары -->
         <div class="card">
-            <div style="height:80px; background:#333; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#77; font-size:12px;">Пак СМГ</div>
             <h3>Пак СМГ</h3>
             <p>15 руб.</p>
             <button onclick="addToCart('Пак СМГ', 15)">В корзину</button>
         </div>
         <div class="card">
-            <div style="height:80px; background:#333; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#77; font-size:12px;">Пак патронов</div>
             <h3>Пак патронов</h3>
             <p>50 руб.</p>
             <button onclick="addToCart('Пак патронов', 50)">В корзину</button>
         </div>
         <div class="card">
-            <div style="height:80px; background:#333; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#77; font-size:12px;">Пак металла (10k)</div>
             <h3>Пак металла (10k)</h3>
             <p>100 руб.</p>
             <button onclick="addToCart('Пак металла (10k)', 100)">В корзину</button>
         </div>
         <div class="card">
-            <div style="height:80px; background:#333; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#77; font-size:12px;">Топовый кит (оружие)</div>
             <h3>Топовый кит (оружие)</h3>
             <p>250 руб.</p>
             <button onclick="addToCart('Топовый кит (оружие)', 250)">В корзину</button>
-        </div>
-        <div class="card">
-            <div style="height:80px; background:#333; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#77; font-size:12px;">Рейд-набор</div>
-            <h3>Рейд-набор</h3>
-            <p>500 руб.</p>
-            <button onclick="addToCart('Рейд-набор', 500)">В корзину</button>
-        </div>
-        <div class="card">
-            <div style="height:80px; background:#333; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#77; font-size:12px;">Привилегия / Роль</div>
-            <h3>Привилегия / Роль</h3>
-            <p>1000 руб.</p>
-            <button onclick="addToCart('Привилегия / Роль', 1000)">В корзину</button>
         </div>
     </div>
 
@@ -145,20 +128,18 @@
         }
 
         function checkout() {
+            alert('Кнопка нажата!'); // Проверка, срабатывает ли вообще функция
+
             if (cart.length === 0) {
-                alert('Корзина пуста!');
+                alert('Корзина пуста! Добавьте товар.');
                 return;
             }
 
             const BOT_TOKEN = '8829327875:AAE0ChfpfnatcXVLkDJW7pv4grEE5m6t5_w';
-            const CHAT_ID = '455307806'; // Ваш личный ID
-
-            let tgUser = window.Telegram && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user 
-                ? `@${window.Telegram.WebApp.initDataUnsafe.user.username || window.Telegram.WebApp.initDataUnsafe.user.first_name}` 
-                : 'Игрок (Web)';
+            const CHAT_ID = '455307806';
 
             let totalPrice = 0;
-            let message = `🚨 **Новый заказ в магазине ЧСВ!**\n\n👤 Покупатель: ${tgUser}\n\n`;
+            let message = '🚨 Новый заказ в магазине ЧСВ!\n\n';
 
             cart.forEach(item => {
                 let sum = item.price * item.quantity;
@@ -166,31 +147,31 @@
                 message += `- ${item.name} x${item.quantity} (${sum} руб.)\n`;
             });
 
-            message += `\n💰 **Итого к оплате:** ${totalPrice} руб.`;
+            message += `\nИтого: ${totalPrice} руб.`;
+
+            alert('Отправка запроса в Telegram...');
 
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     chat_id: CHAT_ID,
-                    text: message,
-                    parse_mode: 'Markdown'
+                    text: message
                 })
             })
             .then(response => response.json())
             .then(data => {
+                alert('Ответ от Telegram получен: ' + JSON.stringify(data));
                 if (data.ok) {
-                    alert('Заказ успешно отправлен вам в личные сообщения!');
+                    alert('Заказ успешно отправлен!');
                     cart = [];
                     updateCartUI();
                 } else {
-                    alert('Ошибка отправки. Убедитесь, что вы нажали /start в боте!');
-                    console.log(data);
+                    alert('Ошибка от Telegram: ' + (data.description || 'неизвестно'));
                 }
             })
             .catch(error => {
-                console.error('Ошибка:', error);
-                alert('Ошибка соединения с сервером.');
+                alert('Ошибка сети: ' + error.message);
             });
         }
     </script>
