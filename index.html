@@ -144,12 +144,11 @@
 
             text += `\nИтого: ${totalPrice} руб.`;
 
-            // Формируем официальную ссылку на вашего бота с предзаполненным заказом
-            const botUsername = 'CHSV_SHOP_bot'; // Замените на юзернейм вашего бота, если он другой
+            // Юзернейм вашего бота
+            const botUsername = 'Shop122_bot';
             const encodedText = encodeURIComponent(text);
             const tgUrl = `https://t.me/${botUsername}?start=${encodedText}`;
 
-            // Открываем чат с ботом прямо из приложения Telegram
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.openTelegramLink(tgUrl);
             } else {
