@@ -128,51 +128,33 @@
         }
 
         function checkout() {
-            alert('Кнопка нажата!'); // Проверка, срабатывает ли вообще функция
-
             if (cart.length === 0) {
-                alert('Корзина пуста! Добавьте товар.');
+                alert('Корзина пуста!');
                 return;
             }
 
-            const BOT_TOKEN = '8829327875:AAE0ChfpfnatcXVLkDJW7pv4grEE5m6t5_w';
-            const CHAT_ID = '455307806';
-
             let totalPrice = 0;
-            let message = '🚨 Новый заказ в магазине ЧСВ!\n\n';
+            let text = '🚨 Новый заказ в магазине ЧСВ!\n\n';
 
             cart.forEach(item => {
                 let sum = item.price * item.quantity;
                 totalPrice += sum;
-                message += `- ${item.name} x${item.quantity} (${sum} руб.)\n`;
+                text += `- ${item.name} x${item.quantity} (${sum} руб.)\n`;
             });
 
-            message += `\nИтого: ${totalPrice} руб.`;
+            text += `\nИтого: ${totalPrice} руб.`;
 
-            alert('Отправка запроса в Telegram...');
+            // Формируем официальную ссылку на вашего бота с предзаполненным заказом
+            const botUsername = 'CHSV_SHOP_bot'; // Замените на юзернейм вашего бота, если он другой
+            const encodedText = encodeURIComponent(text);
+            const tgUrl = `https://t.me/${botUsername}?start=${encodedText}`;
 
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: CHAT_ID,
-                    text: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Ответ от Telegram получен: ' + JSON.stringify(data));
-                if (data.ok) {
-                    alert('Заказ успешно отправлен!');
-                    cart = [];
-                    updateCartUI();
-                } else {
-                    alert('Ошибка от Telegram: ' + (data.description || 'неизвестно'));
-                }
-            })
-            .catch(error => {
-                alert('Ошибка сети: ' + error.message);
-            });
+            // Открываем чат с ботом прямо из приложения Telegram
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.openTelegramLink(tgUrl);
+            } else {
+                window.location.href = tgUrl;
+            }
         }
     </script>
 </body>
