@@ -106,6 +106,12 @@
     <script>
         let cart = [];
 
+        // Инициализация Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
+
         function addToCart(name, price) {
             let existingItem = cart.find(item => item.name === name);
             if (existingItem) {
@@ -133,27 +139,53 @@
                 return;
             }
 
+            const BOT_TOKEN = '8829327875:AAE0ChfpfnatcXVLkDJW7pv4grEE5m6t5_w';
+            const ADMIN_ID = '455307806'; // Ваш личный ID в ЛС
+
+            // Получаем ник игрока из телеграма
+            let tgUser = 'Игрок';
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                let user = window.Telegram.WebApp.initDataUnsafe.user;
+                tgUser = user.username ? `@${user.username}` : user.first_name;
+            }
+
             let totalPrice = 0;
-            let text = '🚨 Новый заказ в магазине ЧСВ!\n\n';
+            let message = `🚨 **Новый заказ в магазине ЧСВ!**\n\n👤 Покупатель: ${tgUser}\n\n`;
 
             cart.forEach(item => {
                 let sum = item.price * item.quantity;
                 totalPrice += sum;
-                text += `- ${item.name} x${item.quantity} (${sum} руб.)\n`;
+                message += `- ${item.name} x${item.quantity} (${sum} руб.)\n`;
             });
 
-            text += `\nИтого: ${totalPrice} руб.`;
+            message += `\n💰 **Итого:** ${totalPrice} руб.`;
 
-            // Юзернейм вашего бота
-            const botUsername = 'Shop122_bot';
-            const encodedText = encodeURIComponent(text);
-            const tgUrl = `https://t.me/${botUsername}?start=${encodedText}`;
-
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.openTelegramLink(tgUrl);
-            } else {
-                window.location.href = tgUrl;
-            }
+            // Отправка запроса боту напрямую в ЛС админу
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: ADMIN_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok) {
+                    alert('Заказ успешно отправлен администратору в личные сообщения!');
+                    cart = [];
+                    updateCartUI();
+                } else {
+                    alert('Ошибка отправки: ' + (data.description || 'Неизвестная ошибка'));
+                }
+            })
+            .catch(err => {
+                alert('Ошибка сети. Проверьте интернет.');
+                console.error(err);
+            });
         }
     </script>
 </body>
