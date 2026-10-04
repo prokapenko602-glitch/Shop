@@ -30,7 +30,6 @@
             flex-direction: column;
             justify-content: space-between;
         }
-        .card img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: #444; }
         .card h3 { font-size: 14px; margin: 5px 0; }
         .card p { font-size: 13px; color: #ffb700; margin: 5px 0; }
         .card button {
@@ -115,7 +114,7 @@
     <!-- Корзина -->
     <div class="cart-container">
         <div>
-            <b>Ваша корзина:</b> <span id="cart-count">0</span> шт.<br>
+            <b>Корзина:</b> <span id="cart-count">0</span> шт.<br>
             <span id="total-price" style="color: #ffb700; font-weight: bold;">Итого: 0 руб.</span>
         </div>
         <button class="checkout-btn" onclick="checkout()">Оформить</button>
@@ -152,9 +151,8 @@
             }
 
             const BOT_TOKEN = '8829327875:AAE0ChfpfnatcXVLkDJW7pv4grEE5m6t5_w';
-            const CHAT_ID = '-1004341736352';
+            const CHAT_ID = '455307806'; // Ваш личный ID
 
-            // Получаем имя пользователя из Telegram, если доступно
             let tgUser = window.Telegram && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user 
                 ? `@${window.Telegram.WebApp.initDataUnsafe.user.username || window.Telegram.WebApp.initDataUnsafe.user.first_name}` 
                 : 'Игрок (Web)';
@@ -170,7 +168,6 @@
 
             message += `\n💰 **Итого к оплате:** ${totalPrice} руб.`;
 
-            // Отправка в Telegram
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -183,11 +180,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.ok) {
-                    alert('Заказ успешно оформлен! Администрация уже получила уведомление.');
+                    alert('Заказ успешно отправлен вам в личные сообщения!');
                     cart = [];
                     updateCartUI();
                 } else {
-                    alert('Ошибка при отправке заказа.');
+                    alert('Ошибка отправки. Убедитесь, что вы нажали /start в боте!');
                     console.log(data);
                 }
             })
